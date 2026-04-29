@@ -57,18 +57,20 @@ app.use('/api/payment', paymentRoutes);
 const __dirname = path.resolve();
 
 if (process.env.NODE_ENV === 'production') {
-  // Set static folder
-  app.use(express.static(path.join(__dirname, '/client/dist')));
+  // If running from the 'server' directory, go up one level to find 'client'
+  const clientPath = path.join(__dirname, '..', 'client', 'dist');
+  
+  app.use(express.static(clientPath));
 
-  // Any route that is not an API route will serve index.html
   app.get('*', (req, res) =>
-    res.sendFile(path.resolve(__dirname, 'client', 'dist', 'index.html'))
+    res.sendFile(path.resolve(clientPath, 'index.html'))
   );
 } else {
   app.get('/', (req, res) => {
     res.send('API is running...');
   });
 }
+
 
 
 
