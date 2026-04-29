@@ -23,64 +23,82 @@ const Navbar = () => {
     navigate('/login');
   };
 
-  return (
-    <nav className="bg-green-600 shadow-md p-4">
-      <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between">
-        <Link to="/" className="text-white text-2xl font-bold mb-4 md:mb-0">
-          QuickCommerce
-        </Link>
-        
-        <form onSubmit={handleSearch} className="flex-1 max-w-lg w-full px-4 mb-4 md:mb-0">
-          <div className="relative">
-            <input
-              type="text"
-              placeholder="Search for grocery, staples, etc."
-              className="w-full py-2 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-green-400"
-              value={keyword}
-              onChange={(e) => setKeyword(e.target.value)}
-            />
-            <button
-              type="submit"
-              className="absolute right-0 top-0 h-full px-4 text-green-600 bg-white border-l border-gray-300 rounded-r-md hover:bg-gray-50 focus:outline-none"
-            >
-              Search
-            </button>
-          </div>
-        </form>
+  const cartCount = cartItems.reduce((acc, item) => acc + item.qty, 0);
 
-        <div className="flex items-center space-x-6">
-          <Link to="/products" className="text-white font-medium hover:text-green-200 transition">
-            Products
+  return (
+    <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-100 shadow-sm">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16 md:h-20">
+          {/* Logo */}
+          <Link to="/" className="flex items-center gap-2 group">
+            <div className="w-10 h-10 bg-green-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-green-200 group-hover:rotate-12 transition-transform duration-300">
+              <span className="text-xl font-bold">B</span>
+            </div>
+            <span className="text-2xl font-black text-gray-900 tracking-tight">
+              Brodo
+            </span>
           </Link>
-          <Link to="/cart" className="relative text-white font-medium hover:text-green-200 transition flex items-center">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-            </svg>
-            Cart
-            {cartItems.length > 0 && (
-              <span className="absolute -top-2 -right-3 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
-                {cartItems.reduce((acc, item) => acc + item.qty, 0)}
-              </span>
-            )}
-          </Link>
-          {user ? (
-            <div className="flex items-center space-x-4">
-              <span className="text-white font-medium">Hi, {user.name}</span>
+
+          {/* Desktop Search */}
+          <form onSubmit={handleSearch} className="hidden md:flex flex-1 max-w-md mx-8">
+            <div className="relative w-full group">
+              <input
+                type="text"
+                placeholder="Search for anything..."
+                className="w-full bg-gray-50 border-none rounded-2xl py-2.5 pl-4 pr-12 text-sm focus:ring-2 focus:ring-green-500/20 focus:bg-white transition-all duration-300"
+                value={keyword}
+                onChange={(e) => setKeyword(e.target.value)}
+              />
               <button
-                onClick={handleLogout}
-                className="bg-white text-green-600 px-4 py-2 rounded-md font-medium hover:bg-gray-100 transition"
+                type="submit"
+                className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-gray-400 hover:text-green-600 transition-colors"
               >
-                Logout
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
               </button>
             </div>
-          ) : (
-            <Link
-              to="/login"
-              className="bg-white text-green-600 px-4 py-2 rounded-md font-medium hover:bg-gray-100 transition"
-            >
-              Login
+          </form>
+
+          {/* Right Section */}
+          <div className="flex items-center gap-2 sm:gap-4">
+            <Link to="/products" className="hidden sm:block text-sm font-semibold text-gray-600 hover:text-green-600 transition-colors px-3 py-2 rounded-xl hover:bg-green-50">
+              Explore
             </Link>
-          )}
+
+            <Link to="/cart" className="relative p-2 text-gray-600 hover:text-green-600 hover:bg-green-50 rounded-xl transition-all duration-300 group">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+              </svg>
+              {cartCount > 0 && (
+                <span className="absolute top-1 right-1 bg-green-600 text-white text-[10px] font-bold rounded-full h-4 w-4 flex items-center justify-center border-2 border-white animate-bounce">
+                  {cartCount}
+                </span>
+              )}
+            </Link>
+
+            {user ? (
+              <div className="flex items-center gap-3 pl-2 border-l border-gray-100">
+                <div className="hidden md:block text-right">
+                  <p className="text-xs text-gray-400 font-medium">Hello,</p>
+                  <p className="text-sm font-bold text-gray-900">{user.name.split(' ')[0]}</p>
+                </div>
+                <button
+                  onClick={handleLogout}
+                  className="bg-gray-900 text-white px-4 py-2 rounded-xl text-sm font-bold hover:bg-gray-800 transition-all duration-300 shadow-md shadow-gray-200"
+                >
+                  Logout
+                </button>
+              </div>
+            ) : (
+              <Link
+                to="/login"
+                className="bg-green-600 text-white px-6 py-2 rounded-xl text-sm font-bold hover:bg-green-700 transition-all duration-300 shadow-lg shadow-green-200"
+              >
+                Login
+              </Link>
+            )}
+          </div>
         </div>
       </div>
     </nav>
@@ -88,3 +106,4 @@ const Navbar = () => {
 };
 
 export default Navbar;
+

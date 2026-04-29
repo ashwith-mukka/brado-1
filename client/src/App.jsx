@@ -10,7 +10,9 @@ import Products from './pages/Products';
 import ProductDetails from './pages/ProductDetails';
 import Cart from './pages/Cart';
 import Checkout from './pages/Checkout';
+import OrderSuccess from './pages/OrderSuccess';
 import Navbar from './components/Navbar';
+
 
 // Admin imports
 import AdminRoute from './components/AdminRoute';
@@ -76,7 +78,16 @@ function App() {
             }
           />
           <Route
+            path="/order-success/:id"
+            element={
+              <ProtectedRoute>
+                <OrderSuccess />
+              </ProtectedRoute>
+            }
+          />
+          <Route
             path="/"
+
             element={
               <ProtectedRoute>
                 <Home />

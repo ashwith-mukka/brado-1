@@ -17,7 +17,7 @@ export const getProducts = async (req, res) => {
 
     const category = req.query.category ? { category: req.query.category } : {};
 
-    const products = await Product.find({ ...keyword, ...category });
+    const products = await Product.find({ ...keyword, ...category }).sort({ createdAt: -1 });
     res.json(products);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -71,8 +71,7 @@ export const createProduct = async (req, res) => {
       description: 'Sample description',
       image: 'https://via.placeholder.com/150',
       category: 'Sample category',
-      countInStock: 0,
-      unit: '1 pc',
+      stock: 0,
     });
 
     const createdProduct = await product.save();
@@ -87,7 +86,7 @@ export const createProduct = async (req, res) => {
 // @access  Private/Admin
 export const updateProduct = async (req, res) => {
   try {
-    const { name, price, description, image, category, countInStock, unit } = req.body;
+    const { name, price, description, image, category, stock } = req.body;
 
     const product = await Product.findById(req.params.id);
 
@@ -97,8 +96,7 @@ export const updateProduct = async (req, res) => {
       product.description = description;
       product.image = image;
       product.category = category;
-      product.countInStock = countInStock;
-      product.unit = unit;
+      product.stock = stock;
 
       const updatedProduct = await product.save();
       res.json(updatedProduct);
@@ -129,3 +127,4 @@ export const deleteProduct = async (req, res) => {
     res.status(404).json({ message: error.message });
   }
 };
+

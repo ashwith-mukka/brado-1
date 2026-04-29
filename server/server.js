@@ -6,6 +6,7 @@ import authRoutes from './routes/authRoutes.js';
 import productRoutes from './routes/productRoutes.js';
 import orderRoutes from './routes/orderRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
+import paymentRoutes from './routes/paymentRoutes.js';
 
 dotenv.config();
 
@@ -13,6 +14,7 @@ dotenv.config();
 connectDB();
 
 const app = express();
+
 
 // ── CORS ──────────────────────────────────────────────────────────────────────
 // In production, only allow requests from your deployed frontend domain.
@@ -47,6 +49,8 @@ app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/payment', paymentRoutes);
+
 
 // Error Handling Middleware
 app.use((err, req, res, next) => {

@@ -23,14 +23,20 @@ const productSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    countInStock: {
+    stock: {
       type: Number,
       required: true,
       default: 0,
     },
-    unit: {
-      type: String, // e.g., '1 kg', '500 g', '1 Dozen'
-      required: true,
+    rating: {
+      type: Number,
+      required: false,
+      default: 0,
+    },
+    numReviews: {
+      type: Number,
+      required: false,
+      default: 0,
     },
   },
   {
@@ -41,3 +47,4 @@ const productSchema = new mongoose.Schema(
 const Product = mongoose.model('Product', productSchema);
 
 export default Product;
+
