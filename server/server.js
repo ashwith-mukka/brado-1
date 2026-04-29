@@ -24,21 +24,27 @@ const app = express();
 // e.g. ALLOWED_ORIGINS=https://your-app.vercel.app
 const allowedOrigins = process.env.ALLOWED_ORIGINS
   ? process.env.ALLOWED_ORIGINS.split(',').map((o) => o.trim())
-  : ['http://localhost:5173', 'http://localhost:3000'];
+  : ['http://localhost:5173', 'http://localhost:3000', 'https://brado-1.vercel.app'];
 
 app.use(
   cors({
     origin: (origin, callback) => {
       // Allow requests with no origin (Postman, mobile apps, curl)
       if (!origin) return callback(null, true);
-      if (allowedOrigins.includes(origin)) {
+      
+      // Check if origin is in the allowed list or is a Vercel preview URL
+      const isAllowed = allowedOrigins.includes(origin) || origin.endsWith('.vercel.app');
+      
+      if (isAllowed) {
         return callback(null, true);
       }
+      
       return callback(new Error(`CORS policy blocked origin: ${origin}`));
     },
     credentials: true,
   })
 );
+
 
 app.use(express.json());
 
