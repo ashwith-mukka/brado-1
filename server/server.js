@@ -8,6 +8,8 @@ import orderRoutes from './routes/orderRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
 import paymentRoutes from './routes/paymentRoutes.js';
 import path from 'path';
+import fs from 'fs';
+
 
 
 dotenv.config();
@@ -18,10 +20,6 @@ connectDB();
 const app = express();
 
 
-// ── CORS ──────────────────────────────────────────────────────────────────────
-// In production, only allow requests from your deployed frontend domain.
-// Set ALLOWED_ORIGINS in your Render env vars as a comma-separated list.
-// e.g. ALLOWED_ORIGINS=https://your-app.vercel.app
 const allowedOrigins = process.env.ALLOWED_ORIGINS
   ? process.env.ALLOWED_ORIGINS.split(',').map((o) => o.trim())
   : ['http://localhost:5173', 'http://localhost:3000', 'https://brado-1.vercel.app'];
@@ -29,21 +27,27 @@ const allowedOrigins = process.env.ALLOWED_ORIGINS
 app.use(
   cors({
     origin: (origin, callback) => {
-      // Allow requests with no origin (Postman, mobile apps, curl)
+      // Allow requests with no origin (like mobile apps or curl)
       if (!origin) return callback(null, true);
       
-      // Check if origin is in the allowed list or is a Vercel preview URL
-      const isAllowed = allowedOrigins.includes(origin) || origin.endsWith('.vercel.app');
-      
+      // Allow if origin is in list, is localhost, or is a Vercel/Render domain
+      const isAllowed = 
+        allowedOrigins.includes(origin) || 
+        origin.includes('localhost') || 
+        origin.endsWith('.vercel.app') || 
+        origin.includes('onrender.com');
+
       if (isAllowed) {
-        return callback(null, true);
+        callback(null, true);
+      } else {
+        console.error(`Blocked by CORS: ${origin}`);
+        callback(new Error('Not allowed by CORS'));
       }
-      
-      return callback(new Error(`CORS policy blocked origin: ${origin}`));
     },
     credentials: true,
   })
 );
+
 
 
 app.use(express.json());
@@ -59,13 +63,13 @@ app.use('/api/orders', orderRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/payment', paymentRoutes);
 
-// ── DEPLOYMENT ──────────────────────────────────────────────────────────────
-const __dirname = path.resolve();
 
-if (process.env.NODE_ENV === 'production') {
-  // If running from the 'server' directory, go up one level to find 'client'
-  const clientPath = path.join(__dirname, '..', 'client', 'dist');
-  
+// ── DEPLOYMENT ──────────────────────────────────────────────────────────────
+
+const __dirname = path.resolve();
+const clientPath = path.join(__dirname, '..', 'client', 'dist');
+
+if (process.env.NODE_ENV === 'production' && fs.existsSync(clientPath)) {
   app.use(express.static(clientPath));
 
   app.get('*', (req, res) =>
@@ -76,6 +80,7 @@ if (process.env.NODE_ENV === 'production') {
     res.send('API is running...');
   });
 }
+
 
 
 
