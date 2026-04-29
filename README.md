@@ -35,6 +35,3 @@ npm run dev
 
 See `server/.env.example` and `client/.env.example` for required variables.
 
-## Deployment
-
-See [DEPLOYMENT.md](./DEPLOYMENT.md) for the full step-by-step guide.
