@@ -10,6 +10,10 @@ import paymentRoutes from './routes/paymentRoutes.js';
 import cartRoutes from './routes/cartRoutes.js';
 import path from 'path';
 import fs from 'fs';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 
 
@@ -66,7 +70,6 @@ app.use('/api/cart', cartRoutes);
 
 // ── DEPLOYMENT ──────────────────────────────────────────────────────────────
 
-const __dirname = path.resolve();
 const clientPath = path.join(__dirname, '..', 'client', 'dist');
 
 if (process.env.NODE_ENV === 'production' && fs.existsSync(clientPath)) {
