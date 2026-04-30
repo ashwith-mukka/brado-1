@@ -29,10 +29,13 @@ process.on('uncaughtException', (error) => {
 
 dotenv.config();
 
-// Connect to database
-connectDB();
-
 const app = express();
+
+// Database connection middleware for Serverless
+app.use(async (req, res, next) => {
+  await connectDB();
+  next();
+});
 
 // CORS Configuration - Permissive for production stability
 app.use(cors());
@@ -142,7 +145,14 @@ app.use((err, req, res, next) => {
 
 // ── START SERVER ────────────────────────────────────────────────────────────
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`🚀 Server listening on port ${PORT}`);
-  console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
-});
+
+// Export for Vercel
+export default app;
+
+// Only listen if not in a serverless environment
+if (process.env.NODE_ENV !== 'production' || !process.env.VERCEL) {
+  app.listen(PORT, () => {
+    console.log(`🚀 Server listening on port ${PORT}`);
+    console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+  });
+}
