@@ -97,24 +97,21 @@ const possiblePaths = [
   path.join(process.cwd(), 'client', 'dist'),
 ];
 
-let clientPath = possiblePaths[0];
+let clientPath = '';
 for (const p of possiblePaths) {
-  if (fs.existsSync(p)) {
+  if (fs.existsSync(path.join(p, 'index.html'))) {
     clientPath = p;
     break;
   }
 }
 
-// Serve static files if we are in production OR if the dist folder was found (Self-healing logic)
-const isProduction = process.env.NODE_ENV === 'production' || process.env.RENDER === 'true';
-
-if (isProduction && fs.existsSync(clientPath)) {
-  console.log(`Serving static files from: ${clientPath}`);
+if (clientPath) {
+  console.log(`✅ Serving production assets from: ${clientPath}`);
   app.use(express.static(clientPath));
 
-  app.get('*', (req, res) =>
-    res.sendFile(path.resolve(clientPath, 'index.html'))
-  );
+  app.get('*', (req, res) => {
+    res.sendFile(path.resolve(clientPath, 'index.html'));
+  });
 } else {
   // Debug Fallback Route
   app.get('/', (req, res) => {
