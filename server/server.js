@@ -1,4 +1,5 @@
 import express from 'express';
+import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import cors from 'cors';
 import connectDB from './config/db.js';
@@ -58,8 +59,18 @@ console.log('Server initializing...');
 
 const allowedOrigins = process.env.ALLOWED_ORIGINS
   ? process.env.ALLOWED_ORIGINS.split(',').map((o) => o.trim())
-  : ['http://localhost:5173', 'http://localhost:3000', 'https://brado-1.vercel.app'];
+  : ['http://localhost:5173', 'http://localhost:3000', 'https://brado-1.onrender.com'];
 
+app.use(cors({
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin) || process.env.NODE_ENV !== 'production') {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true
+}));
 
 app.use(express.json());
 
@@ -130,6 +141,9 @@ if (isProduction && fs.existsSync(clientPath)) {
           <ul>
             <li>Node Version: <code>${process.version}</code></li>
             <li>Environment: <code>${process.env.NODE_ENV || 'not set'}</code></li>
+            <li>Database Status: <code class="${mongoose.connection.readyState === 1 ? 'status' : 'warning'}">
+              ${['Disconnected', 'Connected', 'Connecting', 'Disconnecting'][mongoose.connection.readyState]}
+            </code></li>
             <li>Static Path: <code>${clientPath}</code></li>
             <li>Static Folder Exists: <code class="${fs.existsSync(clientPath) ? 'status' : 'warning'}">${fs.existsSync(clientPath)}</code></li>
           </ul>

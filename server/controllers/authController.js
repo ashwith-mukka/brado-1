@@ -15,11 +15,16 @@ export const registerUser = async (req, res) => {
   try {
     const { name, email, password } = req.body;
 
+    if (!name || !email || !password) {
+      res.status(400);
+      throw new Error('Please provide all required fields');
+    }
+
     const userExists = await User.findOne({ email });
 
     if (userExists) {
       res.status(400);
-      throw new Error('User already exists');
+      throw new Error('User already exists with this email');
     }
 
     const user = await User.create({
@@ -38,10 +43,14 @@ export const registerUser = async (req, res) => {
       });
     } else {
       res.status(400);
-      throw new Error('Invalid user data');
+      throw new Error('Invalid user data received');
     }
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    console.error('Registration Error:', error.message);
+    res.status(400).json({ 
+      message: error.message || 'Registration failed',
+      error: process.env.NODE_ENV === 'production' ? null : error.stack
+    });
   }
 };
 
