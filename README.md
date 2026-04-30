@@ -14,7 +14,6 @@ A full-stack MERN quick-commerce app (Zepto/Blinkit-style) with product browsing
 quickcommerce/
 ├── client/          # React frontend (Vite)
 ├── server/          # Express backend
-├── DEPLOYMENT.md    # Full deployment guide
 └── package.json     # Root scripts
 ```
 
