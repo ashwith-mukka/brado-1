@@ -70,7 +70,20 @@ app.use('/api/cart', cartRoutes);
 
 // ── DEPLOYMENT ──────────────────────────────────────────────────────────────
 
-const clientPath = path.join(__dirname, '..', 'client', 'dist');
+const possiblePaths = [
+  path.join(__dirname, '..', 'client', 'dist'),
+  path.join(__dirname, 'client', 'dist'),
+  path.resolve(__dirname, '../../client/dist'),
+  path.join(process.cwd(), 'client', 'dist'),
+];
+
+let clientPath = possiblePaths[0];
+for (const p of possiblePaths) {
+  if (fs.existsSync(p)) {
+    clientPath = p;
+    break;
+  }
+}
 
 if (process.env.NODE_ENV === 'production' && fs.existsSync(clientPath)) {
   app.use(express.static(clientPath));
@@ -80,7 +93,21 @@ if (process.env.NODE_ENV === 'production' && fs.existsSync(clientPath)) {
   );
 } else {
   app.get('/', (req, res) => {
-    res.send('API is running...');
+    res.status(200).send(`
+      <!DOCTYPE html>
+      <html lang="en">
+      <head><title>Brado API</title></head>
+      <body style="font-family: sans-serif; padding: 2rem;">
+        <h1>API is running...</h1>
+        <p>Status: <strong>Backend Online</strong></p>
+        <p>Environment: <strong>${process.env.NODE_ENV}</strong></p>
+        <p>Static Path: <code>${clientPath}</code></p>
+        <p>Static Exists: <strong>${fs.existsSync(clientPath)}</strong></p>
+        <hr/>
+        <p>If you see this instead of the app, ensure you have run <code>npm run build</code> and that the <code>dist</code> folder is in the correct location.</p>
+      </body>
+      </html>
+    `);
   });
 }
 

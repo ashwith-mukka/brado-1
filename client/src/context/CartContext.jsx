@@ -40,13 +40,13 @@ export const CartProvider = ({ children }) => {
           // Backend returns cart object with items array
           // We need to transform it to our local cartItems format
           const formattedItems = data.items.map(item => ({
-            product: item.product._id,
-            name: item.product.name,
-            image: item.product.image,
-            price: item.product.price,
-            stock: item.product.stock,
+            product: item.product?._id,
+            name: item.product?.name,
+            image: item.product?.image,
+            price: item.product?.price,
+            stock: item.product?.stock,
             qty: item.quantity
-          }));
+          })).filter(item => item.product); // Filter out any items where product is null
           setCartItems(formattedItems);
         } catch (error) {
           console.error('Error fetching cart:', error);
