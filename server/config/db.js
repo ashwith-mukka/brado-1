@@ -10,7 +10,10 @@ const connectDB = async () => {
     console.log(`MongoDB Connected: ${conn.connection.host}`);
   } catch (error) {
     console.error(`Error: ${error.message}`);
-    process.exit(1);
+    // DO NOT EXIT in production to allow the debug dashboard to show up
+    if (process.env.NODE_ENV !== 'production') {
+      process.exit(1);
+    }
   }
 };
 
