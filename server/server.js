@@ -94,26 +94,47 @@ for (const p of possiblePaths) {
   }
 }
 
-if (process.env.NODE_ENV === 'production' && fs.existsSync(clientPath)) {
+// Serve static files if we are in production OR if the dist folder was found (Self-healing logic)
+const isProduction = process.env.NODE_ENV === 'production' || process.env.RENDER === 'true';
+
+if (isProduction && fs.existsSync(clientPath)) {
+  console.log(`Serving static files from: ${clientPath}`);
   app.use(express.static(clientPath));
 
   app.get('*', (req, res) =>
     res.sendFile(path.resolve(clientPath, 'index.html'))
   );
 } else {
+  // Debug Fallback Route
   app.get('/', (req, res) => {
     res.status(200).send(`
       <!DOCTYPE html>
       <html lang="en">
-      <head><title>Brado API</title></head>
-      <body style="font-family: sans-serif; padding: 2rem;">
-        <h1>API is running...</h1>
-        <p>Status: <strong>Backend Online</strong></p>
-        <p>Environment: <strong>${process.env.NODE_ENV}</strong></p>
-        <p>Static Path: <code>${clientPath}</code></p>
-        <p>Static Exists: <strong>${fs.existsSync(clientPath)}</strong></p>
-        <hr/>
-        <p>If you see this instead of the app, ensure you have run <code>npm run build</code> and that the <code>dist</code> folder is in the correct location.</p>
+      <head>
+        <meta charset="UTF-8">
+        <title>Brado API | Debug</title>
+        <style>
+          body { font-family: -apple-system, system-ui, sans-serif; line-height: 1.6; padding: 2rem; color: #333; background: #f8fafc; }
+          .card { background: white; padding: 2rem; border-radius: 1rem; shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); max-width: 600px; margin: 0 auto; }
+          code { background: #f1f5f9; padding: 0.2rem 0.4rem; border-radius: 0.25rem; }
+          .status { font-weight: bold; color: #16a34a; }
+          .warning { color: #dc2626; font-weight: bold; }
+        </style>
+      </head>
+      <body>
+        <div class="card">
+          <h1>🚀 Brado API Online</h1>
+          <p>Status: <span class="status">Backend Healthy</span></p>
+          <hr/>
+          <p><strong>Environment Info:</strong></p>
+          <ul>
+            <li>Node Version: <code>${process.version}</code></li>
+            <li>Environment: <code>${process.env.NODE_ENV || 'not set'}</code></li>
+            <li>Static Path: <code>${clientPath}</code></li>
+            <li>Static Folder Exists: <code class="${fs.existsSync(clientPath) ? 'status' : 'warning'}">${fs.existsSync(clientPath)}</code></li>
+          </ul>
+          <p class="warning">Notice: If you see this page, please set <code>NODE_ENV=production</code> in your Render dashboard.</p>
+        </div>
       </body>
       </html>
     `);
