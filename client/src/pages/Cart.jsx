@@ -13,7 +13,7 @@ const Cart = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div className="py-12">
       <div className="flex items-center gap-4 mb-10">
         <h1 className="text-4xl font-black text-gray-900 tracking-tight">Shopping Bag</h1>
         <span className="bg-green-100 text-green-600 px-3 py-1 rounded-full text-sm font-bold">

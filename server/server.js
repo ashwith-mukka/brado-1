@@ -7,6 +7,7 @@ import productRoutes from './routes/productRoutes.js';
 import orderRoutes from './routes/orderRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
 import paymentRoutes from './routes/paymentRoutes.js';
+import cartRoutes from './routes/cartRoutes.js';
 import path from 'path';
 import fs from 'fs';
 
@@ -18,6 +19,13 @@ dotenv.config();
 connectDB();
 
 const app = express();
+
+// Request Logger for debugging
+app.use((req, res, next) => {
+  console.log(`${req.method} ${req.url} - ${req.headers.origin || 'No Origin'}`);
+  next();
+});
+
 
 // Manual CORS fallback for extra safety
 app.use((req, res, next) => {
@@ -40,32 +48,6 @@ const allowedOrigins = process.env.ALLOWED_ORIGINS
   : ['http://localhost:5173', 'http://localhost:3000', 'https://brado-1.vercel.app'];
 
 
-app.use(
-  cors({
-    origin: (origin, callback) => {
-      // Allow requests with no origin (like mobile apps or curl)
-      if (!origin) return callback(null, true);
-      
-      // Allow if origin is in list, is localhost, or is a Vercel/Render domain
-      const isAllowed = 
-        allowedOrigins.includes(origin) || 
-        origin.includes('localhost') || 
-        origin.endsWith('.vercel.app') || 
-        origin.includes('onrender.com');
-
-      if (isAllowed) {
-        callback(null, true);
-      } else {
-        console.error(`Blocked by CORS: ${origin}`);
-        callback(new Error('Not allowed by CORS'));
-      }
-    },
-    credentials: true,
-  })
-);
-
-
-
 app.use(express.json());
 
 // Routes
@@ -73,11 +55,13 @@ app.get('/api/health', (req, res) => {
   res.status(200).json({ status: 'API is running' });
 });
 
+
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/payment', paymentRoutes);
+app.use('/api/cart', cartRoutes);
 
 
 // ── DEPLOYMENT ──────────────────────────────────────────────────────────────

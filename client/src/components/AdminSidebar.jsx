@@ -30,8 +30,9 @@ const AdminSidebar = ({ isOpen, setIsOpen }) => {
       >
         <div className="flex items-center justify-between h-16 px-4 bg-slate-950">
           <Link to="/admin/dashboard" className="text-xl font-bold tracking-wider text-green-400">
-            Brodo Admin
+            Brado Admin
           </Link>
+
           <button 
             className="md:hidden text-gray-300 hover:text-white"
             onClick={() => setIsOpen(false)}

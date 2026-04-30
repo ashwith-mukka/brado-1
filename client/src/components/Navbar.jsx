@@ -26,7 +26,7 @@ const Navbar = () => {
   const cartCount = cartItems.reduce((acc, item) => acc + item.qty, 0);
 
   return (
-    <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-100 shadow-sm">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-100 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 md:h-20">
           {/* Logo */}
@@ -35,7 +35,7 @@ const Navbar = () => {
               <span className="text-xl font-bold">B</span>
             </div>
             <span className="text-2xl font-black text-gray-900 tracking-tight">
-              Brodo
+              Brado
             </span>
           </Link>
 
@@ -62,9 +62,11 @@ const Navbar = () => {
 
           {/* Right Section */}
           <div className="flex items-center gap-2 sm:gap-4">
-            <Link to="/products" className="hidden sm:block text-sm font-semibold text-gray-600 hover:text-green-600 transition-colors px-3 py-2 rounded-xl hover:bg-green-50">
-              Explore
-            </Link>
+            {user && (
+              <Link to="/products" className="hidden sm:block text-sm font-semibold text-gray-600 hover:text-green-600 transition-colors px-3 py-2 rounded-xl hover:bg-green-50">
+                Explore
+              </Link>
+            )}
 
             <Link to="/cart" className="relative p-2 text-gray-600 hover:text-green-600 hover:bg-green-50 rounded-xl transition-all duration-300 group">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">

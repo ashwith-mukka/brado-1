@@ -57,16 +57,24 @@ const Checkout = () => {
     try {
       setLoading(true);
 
+      const config = {
+        headers: {
+          Authorization: `Bearer ${user.token}`,
+        },
+      };
+
       // 1. Create order on backend
       const { data: orderResponse } = await axios.post('/payment/order', {
         amount: totalPrice,
-      });
+      }, config);
+
 
       const options = {
         key: import.meta.env.VITE_RAZORPAY_KEY_ID,
         amount: orderResponse.amount,
         currency: orderResponse.currency,
-        name: 'Brodo Store',
+        name: 'Brado Store',
+
         description: 'Payment for your order',
         image: 'https://img.icons8.com/color/96/shopping-cart.png',
         order_id: orderResponse.id,
@@ -86,7 +94,12 @@ const Checkout = () => {
               }
             };
 
-            const { data: verifyRes } = await axios.post('/payment/verify', verifyData);
+            const { data: verifyRes } = await axios.post('/payment/verify', verifyData, {
+              headers: {
+                Authorization: `Bearer ${user.token}`,
+              },
+            });
+
             
             if (verifyRes.order) {
               clearCart();
@@ -119,17 +132,27 @@ const Checkout = () => {
       });
 
     } catch (error) {
-      console.error('Payment Initiation Error:', error);
-      const errorMsg = error.response?.data?.message || 'Failed to initiate payment. Check your internet or configuration.';
-      toast.error(errorMsg);
+      const message = error.response?.data?.message || error.message;
+      console.error('Detailed Payment Error:', {
+        status: error.response?.status,
+        data: error.response?.data,
+        message: error.message
+      });
+
+      if (error.response?.status === 401) {
+        toast.error('Session expired. Please log out and login again.');
+      } else {
+        toast.error(`Payment Error: ${message}`);
+      }
     } finally {
       setLoading(false);
     }
 
+
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div className="py-12">
       <h1 className="text-4xl font-black text-gray-900 mb-10 tracking-tight">Checkout</h1>
       
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">

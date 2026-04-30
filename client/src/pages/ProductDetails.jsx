@@ -36,7 +36,7 @@ const ProductDetails = () => {
 
   if (!product) {
     return (
-      <div className="max-w-7xl mx-auto px-4 py-16 text-center">
+      <div className="py-16 text-center">
         <h2 className="text-2xl font-bold text-gray-800 mb-4">Product not found</h2>
         <button
           onClick={() => navigate('/products')}
@@ -49,7 +49,7 @@ const ProductDetails = () => {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8">
+    <div className="py-8">
       <button
         onClick={() => navigate(-1)}
         className="text-gray-500 hover:text-green-600 mb-6 flex items-center gap-2 transition"
@@ -92,40 +92,38 @@ const ProductDetails = () => {
           </div>
 
           <div className="flex gap-4">
-            {product.countInStock > 0 && (
-              <select
-                className="border p-4 rounded-lg font-semibold focus:ring-green-500 focus:border-green-500"
-                value={qty}
-                onChange={(e) => setQty(e.target.value)}
-              >
-                {[...Array(product.countInStock).keys()].map((x) => (
-                  <option key={x + 1} value={x + 1}>
-                    Qty: {x + 1}
-                  </option>
-                ))}
-              </select>
+            {product.stock > 0 && (
+              <>
+                <select
+                  className="border p-4 rounded-lg font-semibold focus:ring-green-500 focus:border-green-500"
+                  value={qty}
+                  onChange={(e) => setQty(e.target.value)}
+                >
+                  {[...Array(product.stock).keys()].map((x) => (
+                    <option key={x + 1} value={x + 1}>
+                      Qty: {x + 1}
+                    </option>
+                  ))}
+                </select>
+                <button 
+                  onClick={() => {
+                    addToCart(product, qty);
+                    toast.success('Added to cart!');
+                  }}
+                  className="flex-1 font-bold py-4 px-8 rounded-lg transition-all duration-300 transform hover:-translate-y-1 bg-green-600 text-white hover:bg-green-700 hover:shadow-lg"
+                >
+                  Add to Cart
+                </button>
+              </>
             )}
-            <button 
-              onClick={() => {
-                addToCart(product, qty);
-                toast.success('Added to cart!');
-              }}
-              disabled={product.countInStock === 0}
-              className={`flex-1 font-bold py-4 px-8 rounded-lg transition-all duration-300 transform hover:-translate-y-1 ${
-                product.countInStock === 0 
-                  ? 'bg-gray-300 cursor-not-allowed text-gray-500' 
-                  : 'bg-green-600 text-white hover:bg-green-700 hover:shadow-lg'
-              }`}
-            >
-              Add to Cart
-            </button>
           </div>
           
-          {product.countInStock > 0 ? (
+          {product.stock > 0 ? (
             <p className="mt-4 text-sm text-green-600 font-medium">✓ In Stock</p>
           ) : (
             <p className="mt-4 text-sm text-red-600 font-medium">✗ Out of Stock</p>
           )}
+
         </div>
       </div>
     </div>

@@ -58,10 +58,10 @@ const Products = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8 flex flex-col md:flex-row gap-8">
+    <div className="px-4 py-8 flex flex-col md:flex-row gap-8">
       {/* Sidebar for Categories */}
       <div className="w-full md:w-1/4">
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 sticky top-4">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 sticky top-24">
           <h2 className="text-xl font-bold text-gray-800 mb-4 border-b pb-2">Categories</h2>
           <ul className="space-y-2">
             <li>

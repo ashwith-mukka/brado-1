@@ -49,10 +49,11 @@ const Home = () => {
           <div className="absolute inset-0 bg-gradient-to-r from-black via-black/50 to-transparent"></div>
         </div>
         
-        <div className="container mx-auto px-4 md:px-6 relative z-10">
+        <div className="px-4 md:px-6 relative z-10">
           <div className="max-w-2xl">
             <h1 className="text-4xl md:text-6xl font-black text-white mb-4 leading-tight">
-              Upgrade Your Lifestyle with <span className="text-green-500">Brodo</span>
+              Upgrade Your Lifestyle with <span className="text-green-500">Brado</span>
+
             </h1>
             <p className="text-gray-300 text-lg md:text-xl mb-8 font-medium">
               Discover premium products from Mobiles to Fashion. The ultimate shopping experience.
@@ -76,7 +77,7 @@ const Home = () => {
       <CategorySection activeCategory={activeCategory} onSelectCategory={setActiveCategory} />
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <main className="px-4 sm:px-6 lg:px-8 py-12">
         <div className="flex items-center justify-between mb-8">
           <div>
             <h2 className="text-3xl font-black text-gray-900">

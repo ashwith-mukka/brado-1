@@ -12,6 +12,7 @@ import Cart from './pages/Cart';
 import Checkout from './pages/Checkout';
 import OrderSuccess from './pages/OrderSuccess';
 import Navbar from './components/Navbar';
+import Footer from './components/Footer';
 
 
 // Admin imports
@@ -44,10 +45,15 @@ const ProtectedRoute = ({ children }) => {
 // Main Layout for user-facing pages
 const MainLayout = () => {
   return (
-    <>
+    <div className="min-h-screen bg-gray-50 flex flex-col">
       <Navbar />
-      <Outlet />
-    </>
+      <div className="flex-1 pt-16 md:pt-20 pb-12 md:pb-14">
+        <div className="max-w-7xl mx-auto w-full">
+          <Outlet />
+        </div>
+      </div>
+      <Footer />
+    </div>
   );
 };
 
@@ -85,15 +91,8 @@ function App() {
               </ProtectedRoute>
             }
           />
-          <Route
-            path="/"
+          <Route path="/" element={<Home />} />
 
-            element={
-              <ProtectedRoute>
-                <Home />
-              </ProtectedRoute>
-            }
-          />
         </Route>
       </Routes>
     </Router>

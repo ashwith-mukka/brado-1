@@ -71,12 +71,12 @@ export const loginUser = async (req, res) => {
   }
 };
 
-// @desc    Get user profile
-// @route   GET /api/auth/profile
+// @desc    Get current user info
+// @route   GET /api/auth/me
 // @access  Private
-export const getUserProfile = async (req, res) => {
+export const getMe = async (req, res) => {
   try {
-    const user = await User.findById(req.user._id);
+    const user = await User.findById(req.user._id).select('-password');
 
     if (user) {
       res.json({
@@ -86,10 +86,9 @@ export const getUserProfile = async (req, res) => {
         role: user.role,
       });
     } else {
-      res.status(404);
-      throw new Error('User not found');
+      res.status(404).json({ message: 'User not found' });
     }
   } catch (error) {
-    res.status(404).json({ message: error.message });
+    res.status(500).json({ message: 'Server error' });
   }
 };
