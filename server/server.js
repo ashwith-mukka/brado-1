@@ -34,43 +34,17 @@ connectDB();
 
 const app = express();
 
+// CORS Configuration - Permissive for production stability
+app.use(cors());
+app.use(express.json());
+
 // Request Logger for debugging
 app.use((req, res, next) => {
-  console.log(`${req.method} ${req.url} - ${req.headers.origin || 'No Origin'}`);
-  next();
-});
-
-
-// Manual CORS fallback for extra safety
-app.use((req, res, next) => {
-  const origin = req.headers.origin;
-  res.header('Access-Control-Allow-Origin', origin || '*');
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
-  res.header('Access-Control-Allow-Credentials', 'true');
-  
-  if (req.method === 'OPTIONS') {
-    return res.sendStatus(200);
+  if (!req.url.includes('/assets/')) {
+    console.log(`${req.method} ${req.url}`);
   }
   next();
 });
-
-console.log('Server initializing...');
-
-const allowedOrigins = process.env.ALLOWED_ORIGINS
-  ? process.env.ALLOWED_ORIGINS.split(',').map((o) => o.trim())
-  : ['http://localhost:5173', 'http://localhost:3000', 'https://brado-1.onrender.com'];
-
-app.use(cors({
-  origin: (origin, callback) => {
-    if (!origin || allowedOrigins.includes(origin) || process.env.NODE_ENV !== 'production') {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
-  credentials: true
-}));
 
 app.use(express.json());
 
@@ -78,7 +52,6 @@ app.use(express.json());
 app.get('/api/health', (req, res) => {
   res.status(200).json({ status: 'API is running' });
 });
-
 
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
@@ -91,28 +64,32 @@ app.use('/api/cart', cartRoutes);
 // ── DEPLOYMENT ──────────────────────────────────────────────────────────────
 
 const possiblePaths = [
-  path.join(__dirname, '..', 'client', 'dist'),
-  path.join(__dirname, 'client', 'dist'),
-  path.resolve(__dirname, '../../client/dist'),
-  path.join(process.cwd(), 'client', 'dist'),
+  path.resolve(process.cwd(), 'client', 'dist'),
+  path.resolve(__dirname, '..', 'client', 'dist'),
+  path.resolve(__dirname, 'client', 'dist'),
 ];
 
 let clientPath = '';
+console.log('🔍 Searching for production assets...');
 for (const p of possiblePaths) {
-  if (fs.existsSync(path.join(p, 'index.html'))) {
+  const checkPath = path.join(p, 'index.html');
+  const exists = fs.existsSync(checkPath);
+  console.log(`- Checking: ${p} (${exists ? 'FOUND' : 'MISSING'})`);
+  if (exists) {
     clientPath = p;
     break;
   }
 }
 
 if (clientPath) {
-  console.log(`✅ Serving production assets from: ${clientPath}`);
+  console.log(`🚀 Serving production assets from: ${clientPath}`);
   app.use(express.static(clientPath));
 
   app.get('*', (req, res) => {
-    res.sendFile(path.resolve(clientPath, 'index.html'));
+    res.sendFile(path.join(clientPath, 'index.html'));
   });
 } else {
+  console.log('⚠️ No production assets found. Using debug dashboard.');
   // Debug Fallback Route
   app.get('/', (req, res) => {
     res.status(200).send(`
@@ -141,8 +118,8 @@ if (clientPath) {
             <li>Database Status: <code class="${mongoose.connection.readyState === 1 ? 'status' : 'warning'}">
               ${['Disconnected', 'Connected', 'Connecting', 'Disconnecting'][mongoose.connection.readyState]}
             </code></li>
-            <li>Static Path: <code>${clientPath}</code></li>
-            <li>Static Folder Exists: <code class="${fs.existsSync(clientPath) ? 'status' : 'warning'}">${fs.existsSync(clientPath)}</code></li>
+            <li>Static Path Found: <code>${clientPath || 'NONE'}</code></li>
+            <li>CWD: <code>${process.cwd()}</code></li>
           </ul>
           <p class="warning">Notice: If you see this page, please set <code>NODE_ENV=production</code> in your Render dashboard.</p>
         </div>
@@ -152,15 +129,11 @@ if (clientPath) {
   });
 }
 
-
-
-
-
 // Error Handling Middleware
 app.use((err, req, res, next) => {
+  console.error('SERVER ERROR:', err.message);
   const statusCode = res.statusCode === 200 ? 500 : res.statusCode;
-  res.status(statusCode);
-  res.json({
+  res.status(statusCode).json({
     message: err.message,
     stack: process.env.NODE_ENV === 'production' ? null : err.stack,
   });
