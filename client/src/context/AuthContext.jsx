@@ -7,11 +7,12 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Set default axios base URL — reads from VITE_API_URL in .env
-  // In development: http://localhost:5000/api
-  // In production: https://your-backend.onrender.com/api (set in Vercel env vars)
+  // Set default axios base URL
+  // If we are on production (Render), we use /api to stay on the same host
+  // If we are in local dev, we default to http://localhost:5000/api
   axios.defaults.baseURL =
-    import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+    import.meta.env.VITE_API_URL || 
+    (window.location.hostname === 'localhost' ? 'http://localhost:5000/api' : '/api');
 
   useEffect(() => {
     const userInfo = localStorage.getItem('userInfo');
