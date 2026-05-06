@@ -9,13 +9,13 @@ const Footer = () => {
           © 2026 Brado • Premium Quick Commerce
         </p>
         <div className="flex gap-4 md:gap-6">
-          <Link to="/products" className="text-[10px] md:text-xs font-bold text-gray-600 hover:text-green-600 transition-colors uppercase tracking-widest">
+          <Link to="/privacy" className="text-[10px] md:text-xs font-bold text-gray-600 hover:text-green-600 transition-colors uppercase tracking-widest">
             Privacy
           </Link>
-          <Link to="/products" className="text-[10px] md:text-xs font-bold text-gray-600 hover:text-green-600 transition-colors uppercase tracking-widest">
+          <Link to="/terms" className="text-[10px] md:text-xs font-bold text-gray-600 hover:text-green-600 transition-colors uppercase tracking-widest">
             Terms
           </Link>
-          <Link to="/products" className="text-[10px] md:text-xs font-bold text-gray-600 hover:text-green-600 transition-colors uppercase tracking-widest">
+          <Link to="/support" className="text-[10px] md:text-xs font-bold text-gray-600 hover:text-green-600 transition-colors uppercase tracking-widest">
             Support
           </Link>
         </div>

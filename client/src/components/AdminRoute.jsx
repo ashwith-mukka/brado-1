@@ -1,14 +1,14 @@
-import { useContext } from 'react';
-import { Navigate } from 'react-router-dom';
-import { AuthContext } from '../context/AuthContext';
+import { useContext } from "react";
+import { Navigate } from "react-router-dom";
+import { AuthContext } from "../context/AuthContext";
 
 const AdminRoute = ({ children }) => {
   const { user, loading } = useContext(AuthContext);
 
   if (loading) return <div>Loading...</div>;
 
-  // Assuming `isAdmin` boolean exists on the user object.
-  if (!user || !user.isAdmin) {
+  // Check if user has admin role
+  if (!user || user?.role !== "admin") {
     return <Navigate to="/login" replace />;
   }
 

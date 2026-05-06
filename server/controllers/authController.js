@@ -1,10 +1,13 @@
-import jwt from 'jsonwebtoken';
-import User from '../models/User.js';
+import jwt from "jsonwebtoken";
+import User from "../models/User.js";
 
 // Generate JWT
 const generateToken = (id) => {
-  return jwt.sign({ id }, process.env.JWT_SECRET || 'fallback_secret', {
-    expiresIn: '30d',
+  if (!process.env.JWT_SECRET) {
+    throw new Error("JWT_SECRET environment variable is not set");
+  }
+  return jwt.sign({ id }, process.env.JWT_SECRET, {
+    expiresIn: "30d",
   });
 };
 
@@ -17,14 +20,14 @@ export const registerUser = async (req, res) => {
 
     if (!name || !email || !password) {
       res.status(400);
-      throw new Error('Please provide all required fields');
+      throw new Error("Please provide all required fields");
     }
 
     const userExists = await User.findOne({ email });
 
     if (userExists) {
       res.status(400);
-      throw new Error('User already exists with this email');
+      throw new Error("User already exists with this email");
     }
 
     const user = await User.create({
@@ -43,13 +46,13 @@ export const registerUser = async (req, res) => {
       });
     } else {
       res.status(400);
-      throw new Error('Invalid user data received');
+      throw new Error("Invalid user data received");
     }
   } catch (error) {
-    console.error('Registration Error:', error.message);
-    res.status(400).json({ 
-      message: error.message || 'Registration failed',
-      error: process.env.NODE_ENV === 'production' ? null : error.stack
+    console.error("Registration Error:", error.message);
+    res.status(400).json({
+      message: error.message || "Registration failed",
+      error: process.env.NODE_ENV === "production" ? null : error.stack,
     });
   }
 };
@@ -73,7 +76,7 @@ export const loginUser = async (req, res) => {
       });
     } else {
       res.status(401);
-      throw new Error('Invalid email or password');
+      throw new Error("Invalid email or password");
     }
   } catch (error) {
     res.status(401).json({ message: error.message });
@@ -85,7 +88,7 @@ export const loginUser = async (req, res) => {
 // @access  Private
 export const getMe = async (req, res) => {
   try {
-    const user = await User.findById(req.user._id).select('-password');
+    const user = await User.findById(req.user._id).select("-password");
 
     if (user) {
       res.json({
@@ -95,9 +98,9 @@ export const getMe = async (req, res) => {
         role: user.role,
       });
     } else {
-      res.status(404).json({ message: 'User not found' });
+      res.status(404).json({ message: "User not found" });
     }
   } catch (error) {
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: "Server error" });
   }
 };
