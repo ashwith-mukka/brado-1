@@ -17,13 +17,27 @@ const faqs = [
 ];
 
 const contactCards = [
-  { icon: '💬', title: 'Live Chat', desc: 'Chat with our team for instant help.', detail: 'Available 24/7', color: 'from-green-400 to-emerald-600', shadow: 'shadow-green-200' },
-  { icon: '📧', title: 'Email Us', desc: 'Send us a detailed query anytime.', detail: 'support@brado.com', color: 'from-blue-400 to-indigo-600', shadow: 'shadow-blue-200' },
-  { icon: '📞', title: 'Call Us', desc: 'Speak directly with our support team.', detail: '+91 1800-XXX-XXXX', color: 'from-purple-400 to-violet-600', shadow: 'shadow-purple-200' },
+  { icon: '💬', title: 'Live Chat', desc: 'Chat with our AI assistant for instant help.', detail: 'Click to start chatting →', color: 'from-green-400 to-emerald-600', shadow: 'shadow-green-200', action: 'chat' },
+  { icon: '📧', title: 'Email Us', desc: 'Send us a detailed query anytime.', detail: 'support@brado.com', color: 'from-blue-400 to-indigo-600', shadow: 'shadow-blue-200', action: 'email' },
+  { icon: '📞', title: 'Call Us', desc: 'Speak directly with our support team.', detail: '+91 1800-XXX-XXXX', color: 'from-purple-400 to-violet-600', shadow: 'shadow-purple-200', action: 'call' },
 ];
 
 const Support = () => {
   const [openFaq, setOpenFaq] = useState(null);
+
+  const handleCardClick = (action) => {
+    if (action === 'chat') {
+      // Find and click the live chat button to open it
+      const chatBtn = document.querySelector('.live-chat-btn');
+      if (chatBtn) {
+        chatBtn.click();
+      }
+    } else if (action === 'email') {
+      window.location.href = 'mailto:support@brado.com';
+    } else if (action === 'call') {
+      window.location.href = 'tel:+911800XXXXXXX';
+    }
+  };
 
   return (
     <div className="min-h-screen px-4 py-8 md:py-12">
@@ -47,14 +61,15 @@ const Support = () => {
             initial="hidden"
             animate="visible"
             variants={fadeIn}
-            className="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 p-6 text-center group hover:-translate-y-1"
+            onClick={() => handleCardClick(card.action)}
+            className="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 p-6 text-center group hover:-translate-y-1 cursor-pointer"
           >
             <div className={`inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br ${card.color} ${card.shadow} shadow-lg mb-3 group-hover:scale-110 transition-transform duration-300`}>
               <span className="text-xl">{card.icon}</span>
             </div>
             <h3 className="font-bold text-gray-800 mb-1">{card.title}</h3>
             <p className="text-gray-500 text-xs mb-2">{card.desc}</p>
-            <p className="text-sm font-semibold text-gray-700">{card.detail}</p>
+            <p className={`text-sm font-semibold ${card.action === 'chat' ? 'text-green-600' : 'text-gray-700'}`}>{card.detail}</p>
           </motion.div>
         ))}
       </div>

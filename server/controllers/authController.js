@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
+import { sendWelcomeEmail } from "../utils/email.js";
 
 // Generate JWT
 const generateToken = (id) => {
@@ -26,8 +27,19 @@ export const registerUser = async (req, res) => {
     const userExists = await User.findOne({ email });
 
     if (userExists) {
-      res.status(400);
-      throw new Error("User already exists with this email");
+      // Email exists — try to log them in with the provided password
+      if (await userExists.matchPassword(password)) {
+        return res.json({
+          _id: userExists._id,
+          name: userExists.name,
+          email: userExists.email,
+          role: userExists.role,
+          token: generateToken(userExists._id),
+        });
+      } else {
+        res.status(400);
+        throw new Error("Account already exists with this email. Please use the correct password or login instead.");
+      }
     }
 
     const user = await User.create({
@@ -37,6 +49,9 @@ export const registerUser = async (req, res) => {
     });
 
     if (user) {
+      // Send welcome email (async, don't await to avoid blocking response)
+      sendWelcomeEmail(user.email, user.name);
+
       res.status(201).json({
         _id: user._id,
         name: user.name,
