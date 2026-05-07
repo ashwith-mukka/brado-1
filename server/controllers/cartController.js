@@ -1,12 +1,14 @@
-import Cart from '../models/Cart.js';
-import Product from '../models/Product.js';
+import Cart from "../models/Cart.js";
+import Product from "../models/Product.js";
 
 // @desc    Get user cart
 // @route   GET /api/cart
 // @access  Private
 export const getCart = async (req, res) => {
   try {
-    let cart = await Cart.findOne({ user: req.user._id }).populate('items.product');
+    let cart = await Cart.findOne({ user: req.user._id }).populate(
+      "items.product",
+    );
 
     if (!cart) {
       // Create empty cart if it doesn't exist
@@ -15,7 +17,7 @@ export const getCart = async (req, res) => {
 
     res.json(cart);
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(500).json({ message: "Server error", error: error.message });
   }
 };
 
@@ -27,12 +29,14 @@ export const addToCart = async (req, res) => {
     const { productId, quantity } = req.body;
 
     if (!productId || !quantity) {
-      return res.status(400).json({ message: 'Product ID and quantity are required' });
+      return res
+        .status(400)
+        .json({ message: "Product ID and quantity are required" });
     }
 
     const product = await Product.findById(productId);
     if (!product) {
-      return res.status(404).json({ message: 'Product not found' });
+      return res.status(404).json({ message: "Product not found" });
     }
 
     let cart = await Cart.findOne({ user: req.user._id });
@@ -42,9 +46,18 @@ export const addToCart = async (req, res) => {
     }
 
     // Check if product already exists in cart
-    const itemIndex = cart.items.findIndex(
-      (item) => item.product.toString() === productId
-    );
+    const itemIndex = cart.items.findIndex((item) => {
+      try {
+        // item.product may be an ObjectId or populated document
+        const pid =
+          item.product && item.product._id
+            ? item.product._id.toString()
+            : item.product.toString();
+        return pid === productId;
+      } catch (e) {
+        return false;
+      }
+    });
 
     if (itemIndex > -1) {
       // Product exists, increase quantity
@@ -55,12 +68,12 @@ export const addToCart = async (req, res) => {
     }
 
     await cart.save();
-    
+
     // Return populated cart
-    const updatedCart = await Cart.findById(cart._id).populate('items.product');
+    const updatedCart = await Cart.findById(cart._id).populate("items.product");
     res.status(201).json(updatedCart);
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(500).json({ message: "Server error", error: error.message });
   }
 };
 
@@ -72,22 +85,43 @@ export const updateCartItem = async (req, res) => {
     const { quantity } = req.body;
     const { productId } = req.params;
 
-    if (quantity === undefined || quantity < 0) {
-      return res.status(400).json({ message: 'Valid quantity is required' });
-    }
-
+    // Debug logging to help identify mismatch between URL param and stored items
+    console.log(
+      "updateCartItem called for user",
+      req.user._id,
+      "productId param:",
+      productId,
+    );
     const cart = await Cart.findOne({ user: req.user._id });
-
-    if (!cart) {
-      return res.status(404).json({ message: 'Cart not found' });
-    }
-
-    const itemIndex = cart.items.findIndex(
-      (item) => item.product.toString() === productId
+    console.log(
+      "cart items (raw):",
+      cart
+        ? cart.items.map((i) => ({ product: i.product, quantity: i.quantity }))
+        : "no-cart",
     );
 
+    if (quantity === undefined || quantity < 0) {
+      return res.status(400).json({ message: "Valid quantity is required" });
+    }
+
+    if (!cart) {
+      return res.status(404).json({ message: "Cart not found" });
+    }
+
+    const itemIndex = cart.items.findIndex((item) => {
+      try {
+        const pid =
+          item.product && item.product._id
+            ? item.product._id.toString()
+            : item.product.toString();
+        return pid === productId;
+      } catch (e) {
+        return false;
+      }
+    });
+
     if (itemIndex === -1) {
-      return res.status(404).json({ message: 'Product not found in cart' });
+      return res.status(404).json({ message: "Product not found in cart" });
     }
 
     if (quantity === 0) {
@@ -98,11 +132,11 @@ export const updateCartItem = async (req, res) => {
     }
 
     await cart.save();
-    
-    const updatedCart = await Cart.findById(cart._id).populate('items.product');
+
+    const updatedCart = await Cart.findById(cart._id).populate("items.product");
     res.json(updatedCart);
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(500).json({ message: "Server error", error: error.message });
   }
 };
 
@@ -116,18 +150,26 @@ export const removeFromCart = async (req, res) => {
     const cart = await Cart.findOne({ user: req.user._id });
 
     if (!cart) {
-      return res.status(404).json({ message: 'Cart not found' });
+      return res.status(404).json({ message: "Cart not found" });
     }
 
-    cart.items = cart.items.filter(
-      (item) => item.product.toString() !== productId
-    );
+    cart.items = cart.items.filter((item) => {
+      try {
+        const pid =
+          item.product && item.product._id
+            ? item.product._id.toString()
+            : item.product.toString();
+        return pid !== productId;
+      } catch (e) {
+        return true;
+      }
+    });
 
     await cart.save();
-    
-    const updatedCart = await Cart.findById(cart._id).populate('items.product');
+
+    const updatedCart = await Cart.findById(cart._id).populate("items.product");
     res.json(updatedCart);
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(500).json({ message: "Server error", error: error.message });
   }
 };

@@ -1,34 +1,36 @@
-import { createContext, useState, useEffect, useContext } from 'react';
-import axios from 'axios';
-import { AuthContext } from './AuthContext';
+import { createContext, useState, useEffect, useContext } from "react";
+import axios from "axios";
+import { AuthContext } from "./AuthContext";
 
 export const CartContext = createContext();
 
 export const CartProvider = ({ children }) => {
   const { user } = useContext(AuthContext);
   const [cartItems, setCartItems] = useState(() => {
-    const storedCart = localStorage.getItem('cartItems');
+    const storedCart = localStorage.getItem("cartItems");
     return storedCart ? JSON.parse(storedCart) : [];
   });
 
   const [shippingAddress, setShippingAddress] = useState(() => {
-    const storedAddress = localStorage.getItem('shippingAddress');
-    return storedAddress ? JSON.parse(storedAddress) : {
-      fullName: '',
-      phone: '',
-      address: '',
-      city: '',
-      state: '',
-      pincode: '',
-    };
+    const storedAddress = localStorage.getItem("shippingAddress");
+    return storedAddress
+      ? JSON.parse(storedAddress)
+      : {
+          fullName: "",
+          phone: "",
+          address: "",
+          city: "",
+          state: "",
+          pincode: "",
+        };
   });
 
   useEffect(() => {
-    localStorage.setItem('cartItems', JSON.stringify(cartItems));
+    localStorage.setItem("cartItems", JSON.stringify(cartItems));
   }, [cartItems]);
 
   useEffect(() => {
-    localStorage.setItem('shippingAddress', JSON.stringify(shippingAddress));
+    localStorage.setItem("shippingAddress", JSON.stringify(shippingAddress));
   }, [shippingAddress]);
 
   // Sync cart with backend if user is logged in
@@ -36,20 +38,22 @@ export const CartProvider = ({ children }) => {
     const fetchCart = async () => {
       if (user) {
         try {
-          const { data } = await axios.get('cart');
+          const { data } = await axios.get("cart");
           // Backend returns cart object with items array
           // We need to transform it to our local cartItems format
-          const formattedItems = data.items.map(item => ({
-            product: item.product?._id,
-            name: item.product?.name,
-            image: item.product?.image,
-            price: item.product?.price,
-            stock: item.product?.stock,
-            qty: item.quantity
-          })).filter(item => item.product); // Filter out any items where product is null
+          const formattedItems = data.items
+            .map((item) => ({
+              product: item.product?._id,
+              name: item.product?.name,
+              image: item.product?.image,
+              price: item.product?.price,
+              stock: item.product?.stock,
+              qty: item.quantity,
+            }))
+            .filter((item) => item.product); // Filter out any items where product is null
           setCartItems(formattedItems);
         } catch (error) {
-          console.error('Error fetching cart:', error);
+          console.error("Error fetching cart:", error);
         }
       }
     };
@@ -60,7 +64,7 @@ export const CartProvider = ({ children }) => {
     // Only save to localStorage if NOT logged in
     // If logged in, the state is already synced via APIs
     if (!user) {
-      localStorage.setItem('cartItems', JSON.stringify(cartItems));
+      localStorage.setItem("cartItems", JSON.stringify(cartItems));
     }
   }, [cartItems, user]);
 
@@ -76,32 +80,32 @@ export const CartProvider = ({ children }) => {
 
     if (user) {
       try {
-        const { data } = await axios.post('cart', {
+        const { data } = await axios.post("cart", {
           productId: product._id,
-          quantity: qty
+          quantity: qty,
         });
-        
+
         // Re-format items from populated backend response
-        const formattedItems = data.items.map(item => ({
+        const formattedItems = data.items.map((item) => ({
           product: item.product._id,
           name: item.product.name,
           image: item.product.image,
           price: item.product.price,
           stock: item.product.stock,
-          qty: item.quantity
+          qty: item.quantity,
         }));
         setCartItems(formattedItems);
       } catch (error) {
-        console.error('Error adding to cart:', error);
+        console.error("Error adding to cart:", error);
       }
     } else {
       setCartItems((prevItems) => {
         const existItem = prevItems.find((x) => x.product === item.product);
         if (existItem) {
           return prevItems.map((x) =>
-            x.product === existItem.product 
-              ? { ...existItem, qty: existItem.qty + Number(qty) } 
-              : x
+            x.product === existItem.product
+              ? { ...existItem, qty: existItem.qty + Number(qty) }
+              : x,
           );
         } else {
           return [...prevItems, item];
@@ -114,17 +118,17 @@ export const CartProvider = ({ children }) => {
     if (user) {
       try {
         const { data } = await axios.delete(`cart/${id}`);
-        const formattedItems = data.items.map(item => ({
+        const formattedItems = data.items.map((item) => ({
           product: item.product._id,
           name: item.product.name,
           image: item.product.image,
           price: item.product.price,
           stock: item.product.stock,
-          qty: item.quantity
+          qty: item.quantity,
         }));
         setCartItems(formattedItems);
       } catch (error) {
-        console.error('Error removing from cart:', error);
+        console.error("Error removing from cart:", error);
       }
     } else {
       setCartItems((prevItems) => prevItems.filter((x) => x.product !== id));
@@ -132,26 +136,31 @@ export const CartProvider = ({ children }) => {
   };
 
   const updateQuantity = async (id, qty) => {
+    // If qty is zero or less, remove the item entirely
+    if (qty <= 0) {
+      return removeFromCart(id);
+    }
+
     if (user) {
       try {
         const { data } = await axios.put(`cart/${id}`, { quantity: qty });
-        const formattedItems = data.items.map(item => ({
+        const formattedItems = data.items.map((item) => ({
           product: item.product._id,
           name: item.product.name,
           image: item.product.image,
           price: item.product.price,
           stock: item.product.stock,
-          qty: item.quantity
+          qty: item.quantity,
         }));
         setCartItems(formattedItems);
       } catch (error) {
-        console.error('Error updating cart quantity:', error);
+        console.error("Error updating cart quantity:", error);
       }
     } else {
       setCartItems((prevItems) =>
         prevItems.map((x) =>
-          x.product === id ? { ...x, qty: Number(qty) } : x
-        )
+          x.product === id ? { ...x, qty: Number(qty) } : x,
+        ),
       );
     }
   };
@@ -162,11 +171,14 @@ export const CartProvider = ({ children }) => {
 
   const clearCart = () => {
     setCartItems([]);
-    localStorage.removeItem('cartItems');
+    localStorage.removeItem("cartItems");
   };
 
   // Derived values
-  const itemsPrice = cartItems.reduce((acc, item) => acc + item.qty * item.price, 0);
+  const itemsPrice = cartItems.reduce(
+    (acc, item) => acc + item.qty * item.price,
+    0,
+  );
   const shippingPrice = itemsPrice > 500 ? 0 : 50;
   const taxPrice = Number((0.05 * itemsPrice).toFixed(2));
   const totalPrice = itemsPrice + shippingPrice + taxPrice;
@@ -191,4 +203,3 @@ export const CartProvider = ({ children }) => {
     </CartContext.Provider>
   );
 };
-
