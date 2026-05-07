@@ -18,8 +18,8 @@ const AdminProducts = () => {
     unit: "pcs",
   });
   const { user } = useContext(AuthContext);
-  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
-  const token = localStorage.getItem("token");
+
+  const token = user?.token;
 
   // Fetch products
   useEffect(() => {
@@ -29,7 +29,7 @@ const AdminProducts = () => {
   const fetchProducts = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`${API_URL}/products`, {
+      const response = await axios.get(`products`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setProducts(response.data);
@@ -54,13 +54,13 @@ const AdminProducts = () => {
     try {
       if (editingProduct) {
         // Update product
-        await axios.put(`${API_URL}/products/${editingProduct._id}`, formData, {
+        await axios.put(`products/${editingProduct._id}`, formData, {
           headers: { Authorization: `Bearer ${token}` },
         });
         toast.success("Product updated successfully");
       } else {
         // Create product
-        await axios.post(`${API_URL}/products`, formData, {
+        await axios.post(`products`, formData, {
           headers: { Authorization: `Bearer ${token}` },
         });
         toast.success("Product created successfully");
@@ -91,7 +91,7 @@ const AdminProducts = () => {
     if (!window.confirm("Are you sure you want to delete this product?"))
       return;
     try {
-      await axios.delete(`${API_URL}/products/${productId}`, {
+      await axios.delete(`products/${productId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       toast.success("Product deleted successfully");

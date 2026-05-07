@@ -64,7 +64,7 @@ const Checkout = () => {
       };
 
       // 1. Create order on backend
-      const { data: orderResponse } = await axios.post('/payment/order', {
+      const { data: orderResponse } = await axios.post('payment/order', {
         amount: totalPrice,
       }, config);
 
@@ -94,7 +94,7 @@ const Checkout = () => {
               }
             };
 
-            const { data: verifyRes } = await axios.post('/payment/verify', verifyData, {
+            const { data: verifyRes } = await axios.post('payment/verify', verifyData, {
               headers: {
                 Authorization: `Bearer ${user.token}`,
               },

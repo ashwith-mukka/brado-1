@@ -7,14 +7,14 @@ const OrderHistory = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const { user } = useContext(AuthContext);
-  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+
 
   useEffect(() => {
     const fetchOrders = async () => {
       try {
         setLoading(true);
-        const token = localStorage.getItem("token");
-        const response = await axios.get(`${API_URL}/orders`, {
+        const token = user?.token;
+        const response = await axios.get(`orders/myorders`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -31,7 +31,7 @@ const OrderHistory = () => {
     if (user) {
       fetchOrders();
     }
-  }, [user, API_URL]);
+  }, [user]);
 
   if (loading) {
     return (
@@ -104,11 +104,8 @@ const OrderHistory = () => {
                     </span>
                   </div>
                   <div>
-                    <p className="text-gray-600 text-sm font-medium">
-                      Total Amount
-                    </p>
                     <p className="text-gray-900 font-bold text-sm">
-                      ₹{order.totalAmount?.toFixed(2) || "N/A"}
+                      ₹{order.totalPrice?.toFixed(2) || "N/A"}
                     </p>
                   </div>
                 </div>

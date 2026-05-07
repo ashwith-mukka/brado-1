@@ -65,13 +65,14 @@ export const getCategories = async (req, res) => {
 // @access  Private/Admin
 export const createProduct = async (req, res) => {
   try {
+    const { name, price, description, image, category, stock } = req.body;
     const product = new Product({
-      name: 'Sample name',
-      price: 0,
-      description: 'Sample description',
-      image: 'https://via.placeholder.com/150',
-      category: 'Sample category',
-      stock: 0,
+      name: name || 'Sample name',
+      price: price || 0,
+      description: description || 'Sample description',
+      image: image || 'https://via.placeholder.com/150',
+      category: category || 'Sample category',
+      stock: stock || 0,
     });
 
     const createdProduct = await product.save();

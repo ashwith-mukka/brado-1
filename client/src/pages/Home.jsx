@@ -20,8 +20,8 @@ const Home = () => {
       try {
         setLoading(true);
         const url = activeCategory
-          ? `/products?category=${activeCategory}`
-          : `/products`;
+          ? `products?category=${activeCategory}`
+          : `products`;
 
         const { data } = await axios.get(url);
         setProducts(data);

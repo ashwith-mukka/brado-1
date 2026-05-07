@@ -100,6 +100,12 @@ function App() {
         <Route element={<MainLayout />}>
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/products" element={<Products />} />
+          <Route path="/products/:id" element={<ProductDetails />} />
+          <Route path="/privacy" element={<Privacy />} />
+          <Route path="/terms" element={<Terms />} />
+          <Route path="/support" element={<Support />} />
+          <Route path="/" element={<Home />} />
         </Route>
 
         {/* All other routes - protected, require login */}
@@ -110,16 +116,10 @@ function App() {
             </ProtectedRoute>
           }
         >
-          <Route path="/products" element={<Products />} />
-          <Route path="/products/:id" element={<ProductDetails />} />
           <Route path="/cart" element={<Cart />} />
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/order-success/:id" element={<OrderSuccess />} />
           <Route path="/my-orders" element={<OrderHistory />} />
-          <Route path="/privacy" element={<Privacy />} />
-          <Route path="/terms" element={<Terms />} />
-          <Route path="/support" element={<Support />} />
-          <Route path="/" element={<Home />} />
         </Route>
       </Routes>
     </Router>

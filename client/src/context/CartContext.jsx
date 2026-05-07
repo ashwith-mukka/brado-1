@@ -36,7 +36,7 @@ export const CartProvider = ({ children }) => {
     const fetchCart = async () => {
       if (user) {
         try {
-          const { data } = await axios.get('/cart');
+          const { data } = await axios.get('cart');
           // Backend returns cart object with items array
           // We need to transform it to our local cartItems format
           const formattedItems = data.items.map(item => ({
@@ -76,7 +76,7 @@ export const CartProvider = ({ children }) => {
 
     if (user) {
       try {
-        const { data } = await axios.post('/cart', {
+        const { data } = await axios.post('cart', {
           productId: product._id,
           quantity: qty
         });
@@ -113,7 +113,7 @@ export const CartProvider = ({ children }) => {
   const removeFromCart = async (id) => {
     if (user) {
       try {
-        const { data } = await axios.delete(`/cart/${id}`);
+        const { data } = await axios.delete(`cart/${id}`);
         const formattedItems = data.items.map(item => ({
           product: item.product._id,
           name: item.product.name,
@@ -134,7 +134,7 @@ export const CartProvider = ({ children }) => {
   const updateQuantity = async (id, qty) => {
     if (user) {
       try {
-        const { data } = await axios.put(`/cart/${id}`, { quantity: qty });
+        const { data } = await axios.put(`cart/${id}`, { quantity: qty });
         const formattedItems = data.items.map(item => ({
           product: item.product._id,
           name: item.product.name,

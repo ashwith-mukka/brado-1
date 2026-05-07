@@ -21,7 +21,7 @@ const Products = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const { data } = await axios.get('/products/categories');
+        const { data } = await axios.get('products/categories');
         setCategories(data);
       } catch (error) {
         console.error('Error fetching categories:', error);
@@ -34,7 +34,7 @@ const Products = () => {
     const fetchProducts = async () => {
       try {
         setLoading(true);
-        let url = '/products?';
+        let url = 'products?';
         if (keyword) url += `keyword=${keyword}&`;
         if (categoryFilter) url += `category=${categoryFilter}&`;
         

@@ -12,7 +12,7 @@ export const AuthProvider = ({ children }) => {
   // If we are in local dev, we default to http://localhost:5000/api
   axios.defaults.baseURL =
     import.meta.env.VITE_API_URL || 
-    (['localhost', '127.0.0.1'].includes(window.location.hostname) ? 'http://localhost:5000/api' : '/api');
+    (['localhost', '127.0.0.1'].includes(window.location.hostname) ? 'http://localhost:5000/api/' : '/api/');
 
   useEffect(() => {
     const userInfo = localStorage.getItem('userInfo');
@@ -25,7 +25,7 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const login = async (email, password) => {
-    const { data } = await axios.post('/auth/login', { email, password });
+    const { data } = await axios.post('auth/login', { email, password });
     setUser(data);
     localStorage.setItem('userInfo', JSON.stringify(data));
     axios.defaults.headers.common['Authorization'] = `Bearer ${data.token}`;
@@ -33,7 +33,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const register = async (name, email, password) => {
-    const { data } = await axios.post('/auth/register', { name, email, password });
+    const { data } = await axios.post('auth/register', { name, email, password });
     setUser(data);
     localStorage.setItem('userInfo', JSON.stringify(data));
     axios.defaults.headers.common['Authorization'] = `Bearer ${data.token}`;

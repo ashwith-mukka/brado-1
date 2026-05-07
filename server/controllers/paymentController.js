@@ -66,6 +66,12 @@ export const verifyPayment = async (req, res) => {
       .digest('hex');
 
     if (expectedSignature === razorpay_signature) {
+      // Check if order already exists to prevent duplicates
+      const existingOrder = await Order.findOne({ 'paymentResult.razorpay_payment_id': razorpay_payment_id });
+      if (existingOrder) {
+        return res.json({ message: 'Payment already verified', order: existingOrder });
+      }
+
       // Payment is verified, create order in database
       const order = new Order({
         user: req.user._id,
