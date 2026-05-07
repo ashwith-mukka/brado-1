@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { CartContext } from "../context/CartContext";
@@ -6,6 +6,24 @@ import toast from "react-hot-toast";
 
 const ProductCard = ({ product }) => {
   const { addToCart } = useContext(CartContext);
+  const [imgSrc, setImgSrc] = useState(product.image);
+  const [triedAlternate, setTriedAlternate] = useState(false);
+
+  const fallback =
+    "https://via.placeholder.com/600x600?text=Image+Not+Available";
+
+  const handleImgError = () => {
+    // If it's an Unsplash search URL, try a simpler category-based source once
+    if (!triedAlternate && imgSrc.includes("source.unsplash.com")) {
+      setTriedAlternate(true);
+      const tokens = (product.name || "").split(/\s+/).slice(0, 2).join(",");
+      setImgSrc(
+        `https://source.unsplash.com/600x600/?${encodeURIComponent(tokens)}`,
+      );
+      return;
+    }
+    if (imgSrc !== fallback) setImgSrc(fallback);
+  };
 
   const handleAddToCart = () => {
     addToCart(product, 1);
@@ -30,8 +48,10 @@ const ProductCard = ({ product }) => {
       {/* Image Container */}
       <div className="relative aspect-square overflow-hidden bg-gray-50">
         <img
-          src={product.image}
+          src={imgSrc}
           alt={product.name}
+          loading="lazy"
+          onError={handleImgError}
           className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
         />
         {product.stock <= 0 && (
